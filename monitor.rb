@@ -15,6 +15,9 @@ class ClipboardMonitor
     # 'tag' metadata, set by self.tag
     @tag = ''
 
+    # flag this as an incremental reading extract
+    @is_extract = false
+
     # 'note' metadata - any additional notes for the content copied to
     # the clipboard.
     @note = ''
@@ -54,9 +57,14 @@ class ClipboardMonitor
       'note' => @note,
       'content' => @last_copied_item,
       'source' => @source,
-      'tag' => @tag
+      'tag' => [@tag, (@is_extract ? 'extract' : '')].join(' ').strip
     }
     JSON.pretty_generate(h)
+  end
+
+  def toggle_extract_tag()
+    @is_extract = !@is_extract
+    puts "Tagging as an extract is now #{@is_extract ? 'on' : 'off'}"
   end
 
   def write_old_item()
@@ -152,6 +160,7 @@ def main(io)
     MenuItem.new('tag', 't', 'sets the tag', lambda { print "Enter the tag: "; cm.tag = gets.chomp }),
     MenuItem.new('note', 'n', 'adds a note', lambda { print "Enter a note: "; cm.note = gets.chomp }),
     MenuItem.new('print', 'p', 'prints current clipboard entry', lambda { puts cm.build_output() }),
+    MenuItem.new('extract', 'x', 'toggles the "extract" tag', lambda { cm.toggle_extract_tag() }),
     MenuItem.new('quit', 'q', 'quits', lambda { }),
     MenuItem.new('help', 'h', 'prints available commands', lambda { print_help(menu) })
   ]
