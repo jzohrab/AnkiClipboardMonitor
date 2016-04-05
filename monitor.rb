@@ -67,6 +67,18 @@ class ClipboardMonitor
     puts "Tagging as an extract is now #{@is_extract ? 'on' : 'off'}"
   end
 
+  def get_truncated_quoted_word(s)
+    maxlen = 13
+    output = (s || '')
+    output = output[0, maxlen - 3] + '...' if output.size > maxlen
+    "\"#{output}\""
+  end
+
+  def kill_last()
+    puts "removed #{get_truncated_quoted_word(@last_copied_item)}"
+    @last_copied_item = ''
+  end
+
   def write_old_item()
     return if (@last_copied_item || '').strip.size == 0
     @ostream.puts ',' if @first_clipboard_item_has_been_printed
@@ -87,7 +99,7 @@ class ClipboardMonitor
       # as clipboard items, as that is probably just a copy-paste of
       # the browser URL to set the @source of this monitor.
       if (content != old_content && content !~ /^http[s]:\/\//)
-        print "[monitor: copied \"#{content[0, 10]} ...\"] "
+        print "[monitor: copied #{get_truncated_quoted_word(content)}] "
         write_old_item()
         @last_copied_item = content
       end
@@ -161,6 +173,7 @@ def main(io)
     MenuItem.new('note', 'n', 'adds a note', lambda { print "Enter a note: "; cm.note = gets.chomp }),
     MenuItem.new('print', 'p', 'prints current clipboard entry', lambda { puts cm.build_output() }),
     MenuItem.new('extract', 'x', 'toggles the "extract" tag', lambda { cm.toggle_extract_tag() }),
+    MenuItem.new('kill', 'k', 'kills the last copied item', lambda { cm.kill_last() }),
     MenuItem.new('quit', 'q', 'quits', lambda { }),
     MenuItem.new('help', 'h', 'prints available commands', lambda { print_help(menu) })
   ]
