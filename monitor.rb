@@ -190,5 +190,10 @@ if __FILE__ == $0
   f = FileOstream.new(FileOstream.random_filename())
   puts "Logging to #{f.filename}"
   main(f)
-  puts "Logged to #{f.filename}"
+  if (File.read(f.filename) == "[\n]\n")
+    puts "Nothing logged, removing file."
+    File.delete(f.filename)
+  else
+    puts "Logged to #{f.filename}"
+  end
 end
