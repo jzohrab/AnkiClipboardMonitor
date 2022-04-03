@@ -208,5 +208,13 @@ if __FILE__ == $0
     File.delete(f.filename)
   else
     puts "Logged to #{f.filename}"
+
+    # Write copied text only to a separate file for convenience.
+    j = JSON.load(File.open(f.filename))
+    textfile = "#{f.filename}.txt"
+    File.open(textfile, 'w') do |f|
+      j.map { |h| f.puts h['content'] }
+    end
+    puts "Copied sentences logged to #{textfile}"
   end
 end
